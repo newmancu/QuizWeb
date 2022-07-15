@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    command: python ./quizweb/manage.py runserver 0.0.0.0:8000
+    entrypoint: ./entrypoint.sh
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    restart: always
+    volumes:
+      - ./quizweb:/usr/src/web/quizweb
+    env_file:
+      - ./.dev.env
+  db:
+    image: postgres
+    env_file:
+      - ./.dev.env
+    ports:
+      - 5438:5432
+    restart: always
+    volumes:
+      - quize_db:/var/lib/postgres/
+
+volumes:
+  quize_db:

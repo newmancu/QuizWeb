@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% block head %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+  {% endblock %}
+</head>
+<body>
+
+  <div class="navbar">
+    {% block navbar %}
+      <nav class="navigation">
+        {% if request.user.is_authenticated %}
+          <span class="navigation__user">{{request.user.username}}</span>
+          <a class="naviagation__link" href="/auth/logout">login</a>
+        {% else %}
+          <a class="naviagation__link" href="/auth/login">login</a>
+          <a class="naviagation__link" href="/auth/register">register</a>
+        {% endif %}
+      </nav>
+    {% endblock %}
+  </div>
+
+  <div class="content">
+    {% block body %}
+    {% endblock%}
+  </div>
+
+  <div class="footer">
+
+  </div>
+
+</body>
+</html>

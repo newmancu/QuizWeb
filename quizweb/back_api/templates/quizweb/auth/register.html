@@ -1,0 +1,16 @@
+{% extends "../wrappers/base.html" %}
+
+{% block title %}Register Page{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+  <form action="/auth/register" method="post">
+    {% csrf_token %}
+    {{ form.as_ul }}
+    <input type="submit" value="submit">
+  </form>
+
+{% endblock %}
