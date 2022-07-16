@@ -1,0 +1,39 @@
+{% extends "../wrappers/base.html" %}
+
+{% block title %}Quiz List{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+{% block body %}
+
+<div class="quizzes">
+  <div class="quiz quiz-header">
+    {% for key in quizzes.0 %}
+      <div class="quiz__{{key}} quiz__{{key}}-header">
+        {{key}}
+      </div>
+    {% endfor %}
+  </div>
+  {% for quiz in quizzes %}
+    <div class="quiz">
+      {% for key, val in quiz.items %}
+        {% if key == 'id' %}
+          <a href="{%url 'quiz_answer' val%}" class="quiz__{{key}}">Решить</a>
+        {% else %}
+          <span class="quiz__{{key}}">
+            {{val}}
+          </span>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endfor %}
+  {% if prev is not None %}
+    <a href="{{prev}}" class="quiz__link-nav">Prev</a>
+  {% endif %}
+  {% if next is not None %}
+    <a href="{{next}}" class="quiz__link-nav">Next</a>
+  {% endif %}
+</div>
+
+{% endblock %}

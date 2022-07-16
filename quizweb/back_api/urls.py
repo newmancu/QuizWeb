@@ -8,4 +8,9 @@ urlpatterns = [
         path('register', views.register_view, name='register'),
         path('logout', views.logout_view, name='logout'),
     ])),
+    path('quizzes/', include([
+        path('', views.quiz_list, name='quiz_list'),
+        path('<int:page>/', views.quiz_list, name='quiz_list_page'),
+    ])),
+    path('quiz/<int:id>', views.quiz_answer, name='quiz_answer')
 ]

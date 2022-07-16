@@ -8,6 +8,8 @@ done
 
 echo "Connected to DB"
 
+python ./quizweb/manage.py makemigrations back_api
+python ./quizweb/manage.py migrate back_api
 python ./quizweb/manage.py makemigrations
 python ./quizweb/manage.py migrate
 python ./quizweb/manage.py base_conf

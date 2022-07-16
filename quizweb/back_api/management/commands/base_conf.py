@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth.models import User, Group, Permission
+from django.core.management.base import BaseCommand
+from back_api.models import QuizUser
 
 
 class Command(BaseCommand):
@@ -7,8 +7,8 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
     
-    if not User.objects.filter(username='admin').exists():
-      User.objects.create_superuser(
+    if not QuizUser.objects.filter(username='admin').exists():
+      QuizUser.objects.create_superuser(
         username='admin',
         password='admin',
         email='admin@asdfa.as'

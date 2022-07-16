@@ -1,7 +1,11 @@
+from django.conf import settings
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.http.request import HttpRequest
+from django.urls import reverse
 from back_api import forms
+from back_api import models
 
 # Create your views here.
 
@@ -42,3 +46,32 @@ def register_view(request: HttpRequest):
 def logout_view(request: HttpRequest):
   logout(request)
   return redirect('index')
+
+def quiz_list(request: HttpRequest, page=1):
+  offset = settings.PAGE_OFFSET
+  _prev, _next = None, None
+  quizzes = models.Quiz.objects.all()[offset*(page-1):offset*(page)].values()
+  if page > 1:
+    _prev = reverse('quiz_list') + f'{page-1}'
+  if len(quizzes) >= offset:
+    _next = reverse('quiz_list') + f'{page+1}'
+  context = {
+    'quizzes':quizzes,
+    'next': _next,
+    'prev': _prev
+    }
+  return render(request, 'quizweb/pages/quiz_list.html', context=context)
+
+def quiz_answer(request: HttpRequest, id: int):
+  try:
+    quiz = models.Quiz.objects.get(id=id)
+    questions = quiz.questions.all()
+    print(questions)
+    context = {
+      'questions':questions,
+      'quiz':quiz,
+    }
+    return render(request, 'quizweb/pages/quiz_answer.html', context=context)
+  except Exception as ex:
+    print(ex)
+    raise Http404

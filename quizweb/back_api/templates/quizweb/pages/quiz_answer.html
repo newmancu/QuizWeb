@@ -1,0 +1,33 @@
+{% extends "../wrappers/base.html" %}
+
+{% block title %}Quiz List{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+{% block body %}
+
+<div class="quiz">
+  <div class="quiz__info">
+    <h2 class="quiz__name">{{quiz.name}}</h2>
+    <h3 class="quiz__description">{{quiz.description}}</h3>
+    <h4 class="quiz__payment">{{quiz.payment}}</h4>
+  </div>
+  <form action="post">
+    {% csrf_token%}
+    <ul class="questions">
+      {% for ques in questions %}
+        <li class="question">
+          <h2 class="question__name">{{ques}}</h2>
+          <div class="answers">
+            {% for ans in ques.choices.all %}
+              <p>{{ans}}</p>
+            {% endfor %}
+          </div>
+        </li>
+      {% endfor%}
+    </ul>
+  </form>
+</div>
+
+{% endblock %}
