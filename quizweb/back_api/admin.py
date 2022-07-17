@@ -50,6 +50,10 @@ class QuestionAdmin(admin.ModelAdmin):
 class QuizAnswerAdmin(admin.ModelAdmin):
   pass
 
+@admin.register(models.QuizAnswerVariant)
+class QuizAnswerVariantAdmin(admin.ModelAdmin):
+  pass
+
 
 """OTHER ADMINS"""
 @admin.register(models.Quiz)
@@ -62,19 +66,19 @@ class UserAnswers(admin.ModelAdmin):
   pass  
 
 
-@admin.register(models.QuizSelect)
-class QuizSelectAdmin(admin.ModelAdmin):
-  list_display = ('create_name',)
+# @admin.register(models.QuizSelect)
+# class QuizSelectAdmin(admin.ModelAdmin):
+#   list_display = ('create_name',)
 
-  def create_name(self, obj):
-    url = (
-      reverse("admin:back_api_answer_add")
-      + "?"
-      + urlencode({
-        'quiz':f"{obj.id}",
-        })
-    )
-    name = obj.name
-    return format_html('<a href="{}">{}</a>', url, name)
+#   def create_name(self, obj):
+#     url = (
+#       reverse("admin:back_api_answer_add")
+#       + "?"
+#       + urlencode({
+#         'quiz':f"{obj.id}",
+#         })
+#     )
+#     name = obj.name
+#     return format_html('<a href="{}">{}</a>', url, name)
   
-  create_name.short_description = "Name"
+#   create_name.short_description = "Name"

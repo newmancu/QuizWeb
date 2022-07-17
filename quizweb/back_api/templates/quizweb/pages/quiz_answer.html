@@ -6,8 +6,28 @@
 
 {% endblock %}
 {% block body %}
+  {% if is_anonymus %}
+    <h1 class="anonymus_warning">
+      Сперва авторизуйся
+    </h1>
+  {% else %}
+    <div class="quiz">
+      <div class="quiz__info">
+        <h2 class="quiz__name">{{form.quiz.name}}</h2>
+        <span class="quiz__description">{{form.quiz.description}}</span>
+      </div>
+      <form action="{{ request.path }}" method="post" class="quiz__form">
+        {% csrf_token %}
+        {{ form.questions }}
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}
 
-<div class="quiz">
+
+
+<!-- <div class="quiz">
   <div class="quiz__info">
     <h2 class="quiz__name">{{quiz.name}}</h2>
     <h3 class="quiz__description">{{quiz.description}}</h3>
@@ -28,6 +48,4 @@
       {% endfor%}
     </ul>
   </form>
-</div>
-
-{% endblock %}
+</div> -->

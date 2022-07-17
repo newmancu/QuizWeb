@@ -64,26 +64,51 @@ def quiz_list(request: HttpRequest, page=1):
   return render(request, 'quizweb/pages/quiz_list.html', context=context)
 
 def quiz_answer(request: HttpRequest, id: int):
-  try:
-    quiz = models.Quiz.objects.get(id=id)
-    questions = quiz.questions.all()
-    context = {
-      'questions':questions,
-      'quiz':quiz,
-    }
+  context = {
+    'form': None,
+    'is_anonymus':True,
+  }
+  if request.user.is_anonymous:
     return render(request, 'quizweb/pages/quiz_answer.html', context=context)
-  except Exception as ex:
-    raise Http404
+
+  qa_variant = models.QuizAnswerVariant.objects.filter(
+    user=request.user, quiz_id=id, completed=False).select_related('quiz').first()
+  if qa_variant is None:
+    qa_variant = models.QuizAnswerVariant.objects.create(
+      user=request.user, quiz_id=id, completed=False
+    )
+  quiz = qa_variant.quiz
+
+  if request.method == 'POST':
+    form = forms.QuizAnswerForm(qa_variant=qa_variant, data=request.POST)
+    if form.is_valid():
+      form.save()
+      request.user.balance += quiz.payment
+      request.user.save()
+      return redirect('leaderboard')
+    else:
+      print(form.errors)
+  form = forms.QuizAnswerForm(qa_variant=qa_variant)
+  context = {
+    'form': form,
+    'is_anonymus':False,
+  }
+  return render(request, 'quizweb/pages/quiz_answer.html', context=context)
 
 def leaderboard(request, page=1):
   offset = settings.PAGE_OFFSET
   _prev, _next = None, None
 
-  # quizzes = models.QuizAnswer.objects.all().annotate(
-  #   num_quizzes=Count('quiz', distinct=True))
-  users = models.QuizUser.objects.all().order_by(
-    '-username')[offset*(page-1):offset*(page)].annotate(
-      num_quizzes=Count(('qa_user__quiz'), distinct=True))
+  # users = models.QuizUser.objects.filter(
+  #   qav_user_q__completed=True).select_related(
+  #     'qav_user').annotate(
+  #     num_quizzes=Count(('*'), distinct=True)).order_by(
+  #     '-num_quizzes')[offset*(page-1):offset*(page)]
+
+  users = models.QuizUser.objects.annotate(
+        num_quizzes=Count('qav_user_q__quiz')
+      ).order_by('-num_quizzes', '-username')[offset*(page-1):offset*(page)]
+  print(users.query)
   if page > 1:
     _prev = reverse('leaderboard') + f'{page-1}'
   if len(users) >= offset:
@@ -107,7 +132,6 @@ def profile(request):
       user.bg_color = form.cleaned_data['bg_color']
       user.border_color = form.cleaned_data['border_color']
       user.balance -= cost
-      print(user, type(user))
       user.save()
       return redirect('leaderboard')
   form = forms.QuizUserChangeColorForm(instance=user)

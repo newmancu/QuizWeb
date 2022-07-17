@@ -108,20 +108,37 @@ class QuestionChoice(models.Model):
     return f"{self.choice}"
 
 
-class QuizAnswer(models.Model):
+class QuizAnswerVariant(models.Model):
 
   user = models.ForeignKey(
-    settings.AUTH_USER_MODEL,
+    QuizUser,
     on_delete=models.CASCADE,
     verbose_name='User',
-    related_name='qa_user'
+    related_name='qav_user',
+    related_query_name='qav_user_q',
   )
 
   quiz = models.ForeignKey(
     Quiz,
     on_delete=models.CASCADE,
     verbose_name='Quiz',
-    related_name='qa_quiz'
+    related_name='qav_quiz'
+  )
+
+  completed = models.BooleanField(
+    'Completed quiz answer',
+  )
+
+  def __str__(self):
+    return f"{self.pk}-{self.user}.{self.quiz}"
+
+
+class QuizAnswer(models.Model):
+
+  qa_variant = models.ForeignKey(
+    'QuizAnswerVariant',
+    on_delete=models.CASCADE,
+    verbose_name="Quiz answer variant",
   )
 
   answer = models.ForeignKey(
@@ -133,12 +150,12 @@ class QuizAnswer(models.Model):
   class Meta:
     constraints = [
       models.UniqueConstraint(
-        fields=['user','quiz','answer'], name='unique_user_quiz_answer'
+        fields=['qa_variant','answer'], name='unique_user_quiz_answer'
       )
     ]
 
   def __str__(self):
-    return f"{self.quiz}-{self.user}"
+    return f"<{self.qa_variant.pk}> {self.answer}"
 
 
 class Answer(models.Model):
