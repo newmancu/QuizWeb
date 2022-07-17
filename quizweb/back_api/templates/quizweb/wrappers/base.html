@@ -13,14 +13,19 @@
 
   <div class="navbar">
     {% block navbar %}
-      <nav class="navigation">
+      <nav class="navigation navigation-auth">
         {% if request.user.is_authenticated %}
-          <span class="navigation__user">{{request.user.username}}</span>
-          <a class="naviagation__link" href="/auth/logout">login</a>
+          <a href="{% url 'profile' %}" class="naviagation__link navigation__user">{{request.user.username}}</a>
+          <a class="naviagation__link" href="/auth/logout">logout</a>
         {% else %}
           <a class="naviagation__link" href="/auth/login">login</a>
           <a class="naviagation__link" href="/auth/register">register</a>
         {% endif %}
+      </nav>
+
+      <nav class="navigation naviagtion-pages">
+        <a href="{% url 'quiz_list' %}" class="naviagation__link">Quizzes</a>
+        <a href="{% url 'leaderboard' %}" class="naviagation__link">Leaderboard</a>
       </nav>
     {% endblock %}
   </div>

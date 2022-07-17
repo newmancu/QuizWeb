@@ -45,6 +45,11 @@ class QuizUser(AbstractUser):
     default="#000000"
   )
 
+  def bg_invert(self):
+    a = map(lambda x: int(x, 16) ^ 0xff, [self.bg_color[i:i+2] for i in range(1,len(self.bg_color), 2)])
+    res = '#' + ''.join(map(lambda x: f"{x:02x}", a))
+    return res
+
 
 class Quiz(models.Model):
 
@@ -108,13 +113,15 @@ class QuizAnswer(models.Model):
   user = models.ForeignKey(
     settings.AUTH_USER_MODEL,
     on_delete=models.CASCADE,
-    verbose_name='User'
+    verbose_name='User',
+    related_name='qa_user'
   )
 
   quiz = models.ForeignKey(
     Quiz,
     on_delete=models.CASCADE,
-    verbose_name='Quiz'
+    verbose_name='Quiz',
+    related_name='qa_quiz'
   )
 
   answer = models.ForeignKey(

@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.http.request import HttpRequest
 from django.urls import reverse
+from django.db.models import Count
 from back_api import forms
 from back_api import models
 
@@ -66,12 +67,53 @@ def quiz_answer(request: HttpRequest, id: int):
   try:
     quiz = models.Quiz.objects.get(id=id)
     questions = quiz.questions.all()
-    print(questions)
     context = {
       'questions':questions,
       'quiz':quiz,
     }
     return render(request, 'quizweb/pages/quiz_answer.html', context=context)
   except Exception as ex:
-    print(ex)
     raise Http404
+
+def leaderboard(request, page=1):
+  offset = settings.PAGE_OFFSET
+  _prev, _next = None, None
+
+  # quizzes = models.QuizAnswer.objects.all().annotate(
+  #   num_quizzes=Count('quiz', distinct=True))
+  users = models.QuizUser.objects.all().order_by(
+    '-username')[offset*(page-1):offset*(page)].annotate(
+      num_quizzes=Count(('qa_user__quiz'), distinct=True))
+  if page > 1:
+    _prev = reverse('leaderboard') + f'{page-1}'
+  if len(users) >= offset:
+    _next = reverse('leaderboard') + f'{page+1}'
+  context = {
+    'users':users,
+    'next': _next,
+    'prev': _prev
+    }
+  return render(request, 'quizweb/pages/leaderboard.html', context=context)
+
+def profile(request):
+  cost = settings.COLOR_CHANGE_COST
+  user = request.user
+  if request.method == 'POST':
+    form = forms.QuizUserChangeColorForm(data=request.POST)
+    if form.is_valid() \
+      and (form.cleaned_data['bg_color'] != user.bg_color \
+        or form.cleaned_data['border_color'] != user.border_color) \
+      and user.balance >= cost:
+      user.bg_color = form.cleaned_data['bg_color']
+      user.border_color = form.cleaned_data['border_color']
+      user.balance -= cost
+      print(user, type(user))
+      user.save()
+      return redirect('leaderboard')
+  form = forms.QuizUserChangeColorForm(instance=user)
+  context = {
+    'user': user,
+    'form': form,
+    'cost': cost
+  }
+  return render(request, 'quizweb/pages/profile.html', context=context)

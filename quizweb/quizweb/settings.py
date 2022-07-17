@@ -130,4 +130,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'back_api.QuizUser'
+
+
+"""quizweb settings"""
 PAGE_OFFSET = 20
+COLOR_CHANGE_COST = 100

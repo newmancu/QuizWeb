@@ -46,6 +46,10 @@ class QuestionChoiceAdmin(admin.ModelAdmin):
 class QuestionAdmin(admin.ModelAdmin):
   pass
 
+@admin.register(models.QuizAnswer)
+class QuizAnswerAdmin(admin.ModelAdmin):
+  pass
+
 
 """OTHER ADMINS"""
 @admin.register(models.Quiz)

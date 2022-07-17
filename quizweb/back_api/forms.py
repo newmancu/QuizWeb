@@ -72,3 +72,10 @@ class RadioBoxForm(forms.ModelForm):
     model = models.Answer
     fields = ('question', 'mchoices')
     readonly_fields = ('question',)
+
+
+class QuizUserChangeColorForm(forms.ModelForm):
+
+  class Meta:
+    model = models.QuizUser
+    fields = ('bg_color', 'border_color')
