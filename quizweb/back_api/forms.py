@@ -1,21 +1,18 @@
 from django import forms
-from django.contrib.auth.models import User
-from django.conf import settings
 from django.contrib.auth.forms import (
   UserCreationForm, AuthenticationForm, UserChangeForm,
-  ReadOnlyPasswordHashField, UsernameField
+  UsernameField
 )
-from django.contrib.auth import password_validation
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 from back_api import models
-
 
 
 
 """AUTH FORMS"""
 class QuizUserChangeForm(UserChangeForm):
-
+  """
+  Форма для изменения пользовательской информации
+  через панель администрации
+  """
   class Meta:
     model = models.QuizUser
     fields = "__all__"
@@ -23,66 +20,48 @@ class QuizUserChangeForm(UserChangeForm):
 
 
 class QuizUserAddForm(UserCreationForm):
+  """
+  Форма для создания пользователя
+  через панель администрации
+  """
   class Meta:
     model = models.QuizUser
     fields = "__all__"
     field_classes = {"username": UsernameField}
 
 class LoginForm(AuthenticationForm):
-
+  """
+  Форма для авторизации пользователя
+  """
   class Meta:
     model = models.QuizUser
     fields = ['username', 'password']
 
 class RegisterFrom(UserCreationForm):
-
+  """
+  Форма для регистрации пользователя
+  """
   class Meta:
     model = models.QuizUser
     fields = ['username', 'password1', 'password2']
 
 
+
 """ADMIN FORMS"""
 
-
-class QuestionRadioBoxForm(forms.ModelForm):
-
-  mchoices = forms.Field()
-
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    variants = self.instance.question.choices.all()
-    choices = [(it.pk, it.choice) for it in variants]
-    if self.instance.question.multiple:
-      self.fields['mchoices'] = forms.MultipleChoiceField(
-        choices=choices,
-        widget=forms.CheckboxSelectMultiple
-      )
-    else:
-      self.fields['mchoices'] = forms.ChoiceField(
-        choices=choices,
-        widget=forms.RadioSelect
-      )
-
-  def save(self, commit: bool = ...):
-    self.instance.answer.clear()
-    self.instance.answer.set(self.cleaned_data['mchoices'])
-    self.instance.save(commit)
-
-  class Meta:
-    model = models.Answer
-    fields = ('question', 'mchoices')
-    readonly_fields = ('question',)
-
-
 class QuizUserChangeColorForm(forms.ModelForm):
-
+  """
+  Форма для изменеия цветов профиля пользователя
+  """
   class Meta:
     model = models.QuizUser
     fields = ('bg_color', 'border_color')
 
 
 class QuizQuestionForm(forms.Form):
-
+  """
+  Форма для вывода вопроса и вариантов ответов
+  """
   def __init__(self, *args, **kwargs):
     self.question = kwargs.pop('initial',{}).pop('question', None)
     super().__init__(*args, **kwargs)
@@ -107,11 +86,15 @@ class QuizQuestionForm(forms.Form):
         widget=forms.RadioSelect,
         **options
       )
-    
-SuperFormSet = forms.formset_factory(QuizQuestionForm, min_num=0, max_num=30)
 
-from django.db import connection, reset_queries
+SuperFormSet = forms.formset_factory(QuizQuestionForm, min_num=0)
+
+# from django.db import connection, reset_queries
 class QuizAnswerForm(forms.Form):
+  """
+  Форма для вывода и сохранения всех вопросов
+  из заданного опросника
+  """
 
   def __init__(self, qa_variant, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -120,8 +103,6 @@ class QuizAnswerForm(forms.Form):
     self.qa_variant = qa_variant
     self.quiz = models.Quiz.objects.filter(
       id=qa_variant.quiz.id).prefetch_related('questions__choices')[0]
-
-    # print(len(connection.queries) - start)
 
     self.questions = SuperFormSet(initial=[
       {'question':it} for it in self.quiz.questions.all()
@@ -137,9 +118,8 @@ class QuizAnswerForm(forms.Form):
     return self.cleaned_data
 
   def save(self, commit: bool = ...):
-
-    reset_queries()
-    start = len(connection.queries)
+    # reset_queries()
+    # start = len(connection.queries)
     answers = []
     ans_ans = []
     quiz_answers = []
@@ -165,12 +145,8 @@ class QuizAnswerForm(forms.Form):
         qa_variant=self.qa_variant
       ))
 
-    # print(f"ans_ans = {ans_ans}")
-    # print(f"quiz_answers = {quiz_answers}")
     models.Answer.answer.through.objects.bulk_create(ans_ans)
     models.QuizAnswer.objects.bulk_create(quiz_answers)
     self.qa_variant.completed = True
     self.qa_variant.save()
-    print(len(connection.queries) - start)
-
-    # print(q.cleaned_data, q.question)
+    # print(len(connection.queries) - start)

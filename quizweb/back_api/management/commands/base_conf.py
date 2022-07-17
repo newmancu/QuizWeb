@@ -3,6 +3,9 @@ from back_api.models import QuizUser
 
 
 class Command(BaseCommand):
+  """
+  Команда, добавляющая стандартного суперпользователя
+  """
   help = 'startup command'
 
   def handle(self, *args, **options):

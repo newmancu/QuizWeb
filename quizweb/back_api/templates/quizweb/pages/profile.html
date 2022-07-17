@@ -17,7 +17,12 @@
     <form action="{% url 'profile' %}" class="change_color__form" method="post">
       {% csrf_token %}
       {{ form.as_p }}
-      <input type="submit" value="Save">
+      <div class="button__wrapper">
+        <span class="button__text">
+          Изменить цвета профиля за {{cost}}?
+        </span>
+        <input type="submit" value="Да">
+      </div>
     </form>
 </div>
 

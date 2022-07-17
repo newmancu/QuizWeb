@@ -11,6 +11,9 @@
       Сперва авторизуйся
     </h1>
   {% else %}
+  {% if full_fields %}
+  <h3 class="error">Ответьте на все вопросы</h3>
+  {% endif %}
     <div class="quiz">
       <div class="quiz__info">
         <h2 class="quiz__name">{{form.quiz.name}}</h2>

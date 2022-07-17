@@ -133,5 +133,5 @@ AUTH_USER_MODEL = 'back_api.QuizUser'
 
 
 """quizweb settings"""
-PAGE_OFFSET = 20
-COLOR_CHANGE_COST = 100
+PAGE_OFFSET = 20    # Кол-во объектов на одной странице
+COLOR_CHANGE_COST = 100 # Цена изменеия цветов профиля

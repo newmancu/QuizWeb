@@ -10,9 +10,13 @@
 <div class="quizzes">
   <div class="quiz quiz-header">
     {% for key in quizzes.0 %}
-      <span class="quiz__{{key}} quiz__{{key}}-header">
+    <span class="quiz__{{key}} quiz__{{key}}-header">
+      {% if key == 'id' %}
+        Кнопка
+      {% else %}
         {{key}}
-      </span>
+      {% endif %}
+    </span>
     {% endfor %}
   </div>
   {% for quiz in quizzes %}

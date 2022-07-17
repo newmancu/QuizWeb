@@ -10,66 +10,80 @@ from django.utils.regex_helper import _lazy_re_compile
 color_validator = RegexValidator(
     # _lazy_re_compile(r"^#([0-9a-f]{3}|[0-9a-f]{6})\Z"),
     _lazy_re_compile(r"^#([0-9a-f]{6})\Z"),
-    message="Enter a valid color.",
+    message="Введите корректное значение цвета в 16-разрдном формате RGB (#ffffff).",
     code="invalid",
 )
 
 def validate_color(value):
-    return color_validator(value)
+  return color_validator(value)
 
 
-"""Fields"""
+"""FIELDS"""
 class ColorField(models.CharField):
+  """
+  Поле для хранения информации о цвете в 16-разрдном 
+  формате RGB
+  """
   def __init__(self, *args, **kwargs):
     kwargs['max_length'] = 7
     super().__init__(*args,**kwargs)
     self.validators.append(validate_color)
 
 
-"""CUSTOM USER CLASS"""
 
+"""CUSTOM USER CLASS"""
 class QuizUser(AbstractUser):
+  """
+  Расширенный стандартный пользовательский класс,
+  который хранит информацию о балансе пользователя,
+  цвете фона и цвете рамки
+  """
   balance = models.BigIntegerField(
-    'Balance',
+    'Баланс пользователя',
     validators=[MinValueValidator(0)],
     default=0
   )
   
   bg_color = ColorField(
-    'Background color',
+    'Цвет заднего фона профиля пользователя',
     default="#ffffff"
   )
 
   border_color = ColorField(
-    'Border color',
+    'Цвет рамки профиля пользователя',
     default="#000000"
   )
 
   def bg_invert(self):
+    """
+    Функция инвертации bg_color
+    """
     a = map(lambda x: int(x, 16) ^ 0xff, [self.bg_color[i:i+2] for i in range(1,len(self.bg_color), 2)])
     res = '#' + ''.join(map(lambda x: f"{x:02x}", a))
     return res
 
 
 class Quiz(models.Model):
-
+  """
+  Опросник. Модель в БД.
+  """
   name = models.CharField(
-    'Quiz',
+    'Название опроса',
     max_length=256
   )
 
   description = models.CharField(
-    'Quiz description',
+    'Описание опроса',
     max_length=256
   )
 
   questions = models.ManyToManyField(
     'Question',
-    verbose_name="Quizs' questions"
+    verbose_name="Вопросы в опросе"
   )
 
   payment = models.IntegerField(
-    'Payment',
+    'Вознаграждение за прохождение опроса',
     validators=[MinValueValidator]
   )
 
@@ -78,19 +92,22 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
+  """
+  Вопрос. Модель в БД.
+  """
 
   question = models.CharField(
-    'Question',
+    'Вопрос',
     max_length=256
   )
 
   choices = models.ManyToManyField(
     'QuestionChoice',
-    verbose_name='Choices for the question'
+    verbose_name='Варианты ответа на вопрос'
   )
 
   multiple = models.BooleanField(
-    'multiple choices',
+    'Возможность множественного ответа на вопрос',
   )
 
   def __str__(self):
@@ -98,9 +115,12 @@ class Question(models.Model):
 
 
 class QuestionChoice(models.Model):
+  """
+  Варианты ответов. Модель в БД.
+  """
 
   choice = models.CharField(
-    'Choice',
+    'Варианты ответа на вопрос',
     max_length=256
   )
 
@@ -109,11 +129,14 @@ class QuestionChoice(models.Model):
 
 
 class QuizAnswerVariant(models.Model):
+  """
+  Вариант ответа пользователя на опросник. Модель в БД.
+  """
 
   user = models.ForeignKey(
     QuizUser,
     on_delete=models.CASCADE,
-    verbose_name='User',
+    verbose_name='Пользователь, заполняющий опросник',
     related_name='qav_user',
     related_query_name='qav_user_q',
   )
@@ -121,12 +144,12 @@ class QuizAnswerVariant(models.Model):
   quiz = models.ForeignKey(
     Quiz,
     on_delete=models.CASCADE,
-    verbose_name='Quiz',
+    verbose_name='Шаблон Опросника',
     related_name='qav_quiz'
   )
 
   completed = models.BooleanField(
-    'Completed quiz answer',
+    'Заполнен ли опросник',
   )
 
   def __str__(self):
@@ -134,17 +157,20 @@ class QuizAnswerVariant(models.Model):
 
 
 class QuizAnswer(models.Model):
+  """
+  Ответ на конкретный вопрос из QuizAnswerVariant. Модель в БД.
+  """
 
   qa_variant = models.ForeignKey(
     'QuizAnswerVariant',
     on_delete=models.CASCADE,
-    verbose_name="Quiz answer variant",
+    verbose_name="Опросник, на который отвечает пользовател",
   )
 
   answer = models.ForeignKey(
     'Answer',
     on_delete=models.CASCADE,
-    verbose_name='Answer'
+    verbose_name='Ответ пользователя на опросник'
   )
 
   class Meta:
@@ -159,25 +185,21 @@ class QuizAnswer(models.Model):
 
 
 class Answer(models.Model):
+  """
+  Ответ на вопрос. Модель в БД.
+  """
 
   answer = models.ManyToManyField(
     QuestionChoice,
-    verbose_name="Answer value"
+    verbose_name="Вариант ответа на вопрос"
   )
 
   question = models.ForeignKey(
     Question,
     on_delete=models.CASCADE,
-    verbose_name="Anwer fot Question"
+    verbose_name="Вопрос из опросника"
   )
 
   def __str__(self):
     ans = '; '.join(map(lambda x: x.choice, self.answer.all()))
     return f"{self.question}---{ans}"
-
-
-
-
-class QuizSelect(Quiz):
-  class Meta:
-    proxy = True
