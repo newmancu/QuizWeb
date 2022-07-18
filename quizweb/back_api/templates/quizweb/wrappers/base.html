@@ -6,29 +6,31 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'quizweb/css/main.css' %}">
     <title>{% block title %}{% endblock %}</title>
   {% endblock %}
 </head>
 <body>
 
-  <div class="navbar">
-    {% block navbar %}
+  {% block navbar %}
+    <div class="navbar">
       <nav class="navigation navigation-auth">
         {% if request.user.is_authenticated %}
           <a href="{% url 'profile' %}" class="naviagation__link navigation__user">{{request.user.username}}</a>
-          <a class="naviagation__link" href="/auth/logout">logout</a>
+          <a href="{% url 'logout' %}" class="naviagation__link">logout</a>
         {% else %}
-          <a class="naviagation__link" href="/auth/login">login</a>
-          <a class="naviagation__link" href="/auth/register">register</a>
+          <a href="{% url 'login' %}" class="naviagation__link">login</a>
+          <a href="{% url 'register' %}" class="naviagation__link">register</a>
         {% endif %}
       </nav>
-
+      
       <nav class="navigation naviagtion-pages">
+        <a href="{% url 'index' %}" class="naviagation__link">Главная</a>
         <a href="{% url 'quiz_list' %}" class="naviagation__link">Quizzes</a>
         <a href="{% url 'leaderboard' %}" class="naviagation__link">Leaderboard</a>
       </nav>
-    {% endblock %}
-  </div>
+    </div>
+  {% endblock %}
 
   <div class="content">
     {% block body %}

@@ -1,3 +1,30 @@
 * {
-  background-color: red;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  padding: 5px;
+  background-color: rgb(188, 241, 239);
+}
+
+.grid {
+  width: 100%;
+  display: grid;
+  grid-gap: 10px;
+  padding: 5px;
+}
+
+.grid:nth-child(2n) {
+  background-color: rgb(245, 224, 224);
+}
+
+.grid-1 {
+  grid-template-columns: 1fr 2fr 6fr 1fr;
+  background-color: rgb(206, 182, 182);
+}
+
+.grid-2 {
+  grid-template-columns: 2fr 1fr;
 }

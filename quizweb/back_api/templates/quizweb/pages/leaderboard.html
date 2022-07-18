@@ -2,14 +2,19 @@
 
 {% block title %}Leader Board{% endblock %}
 
-{% block head %}
-
-{% endblock %}
 {% block body %}
 
 <div class="leadearboard">
+    <div class="grid grid-2">
+      <span class="user__username user__username-header">
+        Пользователь
+      </span>
+      <span class="user__quizzes user__quizzes-header">
+        Пройденных опросов
+      </span>
+    </div>
   {% for user in users %}
-    <div class="user"
+    <div class="user grid grid-2"
         style="
         background-color: {{user.bg_color}}; 
         border: 1px solid {{user.border_color}};

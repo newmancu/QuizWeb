@@ -2,12 +2,25 @@
 {% load static %}
 {% block title %}Index Page{% endblock %}
 
-{% block head %}
-  <!-- <link rel="stylesheet" href="{% static 'quizweb/css/main.css' %}"> -->
-{% endblock %}
-
 {% block navigation %}
 {% endblock %}
 
 {% block body %}
+<h1 id="check-list">Check list</h1>
+<ul>
+<li>[x] Регистрация и авторизация пользователея (<code>/auth/register</code> и <code>/auth/login</code>)</li>
+<li>[x] Вывод списка доступных опросов (<code>/quizzes/</code>)</li>
+<li>[x] Вывод списка пользователей и пройденных ими опросов (<code>/leaderboard/</code>)</li>
+<li>[x] Заполнение опроса (<code>/quiz/&lt;int:id&gt;</code>)</li>
+<li>[x] Страница пользователя с возможностью изменить цвета профиля (<code>/profile</code>)</li>
+<li>[ ] Фронт на React</li>
+<li>[ ] Тесты  </li>
+</ul>
+<h1 id="-">Схема БД</h1>
+<h3 id="er-">ER-диаграмма</h3>
+<p>Причина выбора данного типа БД: возможность масштабирования шаблонов вопроса-ответа (добавления текстового ответа, загрузка файла и т.д.)</p>
+<p><img src="{% static 'quizweb/assets/QuizWeb.png' %}" alt="ER-диаграмма"></p>
+<h3 id="kb-">KB-диаграмма</h3>
+<p><img src="{% static 'quizweb/assets/db.svg' %}" alt="KB-диаграмма" width="1028"></p>
+
 {% endblock %}

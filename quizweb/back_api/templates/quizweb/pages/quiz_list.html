@@ -1,26 +1,22 @@
 {% extends "../wrappers/base.html" %}
-
 {% block title %}Quiz List{% endblock %}
 
-{% block head %}
-
-{% endblock %}
 {% block body %}
 
 <div class="quizzes">
-  <div class="quiz quiz-header">
+  <div class="grid grid-1 quiz quiz-header">
     {% for key in quizzes.0 %}
     <span class="quiz__{{key}} quiz__{{key}}-header">
       {% if key == 'id' %}
         Кнопка
       {% else %}
-        {{key}}
+        {{ key }}
       {% endif %}
     </span>
     {% endfor %}
   </div>
   {% for quiz in quizzes %}
-    <div class="quiz">
+    <div class="grid grid-1 quiz">
       {% for key, val in quiz.items %}
         {% if key == 'id' %}
           <a href="{%url 'quiz_answer' val%}" class="quiz__{{key}}">Решить</a>
